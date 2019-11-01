@@ -57,8 +57,8 @@ namespace bobesponja_api.Controller
                 Genero = "Masculino",
                 Color = "Rojo",
                 Especie = "Cangrejo Rojo",
-                Ocupacion = "Es el jefe de Bob Esponja y el dueño del restaurante El Crustáceo Cascarudo",
-                Descripcion = "Persona madura, que tiene su futuro resuelto por poseer el restaurante más exitoso del Fondo de Bikini, le encanta el dinero; frecuentemente suma billetes.",
+                Ocupacion = "Es el jefe de Bob Esponja y el dueño del restaurante El Crustáceo Cascarudo.",
+                Descripcion = "Se comporta como persona madura, que tiene su futuro resuelto por poseer el restaurante más exitoso del Fondo de Bikini, le encanta el dinero; frecuentemente suma billetes.",
             },
 
             new Character
@@ -73,21 +73,39 @@ namespace bobesponja_api.Controller
             },
          };
 
+         string connectionString = @"data source=LAPTOP-B566AHI9\SQLEXPRESS; initial catalog=db_bobesponja; user id=simpsons; password=1234";
 
               [HttpGet("{id}")]
-        public Character GetCharacterList(int id)
+        public Character GetCharacter(int id)
         {
-             return characterList[id];
+             return listOfCharacters[id];
 
         }
 
         [HttpGet]
         public List<Character> GetCharacterList()
         {
-           return characterList;
+           List<Character> characters = new List<Character>();
+           SqlConnection conn = new SqlConnection(connectionString);
+           SqlCommand cmd = new SqlCommand("select * from tbl_character", conn);
+           conn.Open();
+           SqlDataReader reader = cmd.ExecuteReader();
+           while (reader.Read())
+           {
+               Character Character = new Character
+               {
+                   Id = reader.GetInt64(reader.GetOrdinal("id")),
+                   Nombre = reader.GetString(reader.GetOrdinal("nombre")),
+                   Apellido = reader.GetString(reader.GetOrdinal("apellido")),
+                   Genero = reader.GetString(reader.GetOrdinal("genero")),
+                   Color = reader.GetString(reader.GetOrdinal("color")),
+                   Especie = reader.GetString(reader.GetOrdinal("especie")),
+                   Ocupacion = reader.GetString(reader.GetOrdinal("ocupacion")),
+                   Descripcion = reader.GetString(reader.GetOrdinal("descripcion"))
+               };
+           }
+           conn.Close();
+           return characters;
         }
-         }
-    
-
-
+    }
 }
